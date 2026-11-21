@@ -64,6 +64,23 @@ select{flex:1;background:#0a1226;border:1px solid var(--line);color:var(--text);
 .chk{display:flex;justify-content:space-between;gap:10px;width:100%;margin-bottom:6px;text-align:left}
 .chk.on{border-color:var(--ok);color:var(--ok);text-decoration:line-through}
 #gate{border-color:var(--shadow);color:var(--shadow);text-shadow:0 0 8px var(--shadow)}
+main{padding-bottom:100px}
+[data-tab]{display:none}
+body[data-t="misiones"] [data-tab="misiones"],body[data-t="mazmorras"] [data-tab="mazmorras"],body[data-t="progreso"] [data-tab="progreso"],body[data-t="perfil"] [data-tab="perfil"]{display:block}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;background:rgba(5,9,20,.95);border-top:1px solid var(--line);box-shadow:0 -4px 22px rgba(47,107,255,.3);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+#nav button{flex:1;background:none;border:0;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;min-height:52px;padding:4px 0}
+#nav svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#nav button[aria-current=true]{color:var(--glow)}
+#nav button[aria-current=true] svg{filter:drop-shadow(0 0 6px var(--glow))}
+.gate{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #1d3a86}
+.gate:first-child{border-top:0}
+.gate b{width:38px;height:38px;border:1px solid var(--mute);display:grid;place-items:center;font-family:'Orbitron',sans-serif;color:var(--mute);flex:none}
+.gate.open b{border-color:var(--glow);color:var(--glow)}
+.gate.now b{border-color:var(--shadow);color:var(--shadow);box-shadow:0 0 12px rgba(160,107,255,.6)}
+.gate div{flex:1;min-width:0}
+.gate small{display:block;color:var(--mute);font-size:14px}
+.gate.now small{color:var(--shadow)}
+.gate.lock .nm{color:var(--mute)}
 [hidden]{display:none!important}
 #lu{position:fixed;inset:0;background:rgba(2,5,15,.82);display:none;place-items:center;padding:20px;z-index:20}
 #lu.on{display:grid}
@@ -74,7 +91,7 @@ select{flex:1;background:#0a1226;border:1px solid var(--line);color:var(--text);
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body>
+<body data-t="misiones">
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="lu" role="alertdialog" aria-live="assertive"></div>
 <main>
@@ -92,15 +109,16 @@ select{flex:1;background:#0a1226;border:1px solid var(--line);color:var(--text);
     </div>
   </section>
 
-  <div id="alert"></div>
+  <div id="alert" data-tab="misiones"></div>
 
-  <section class="win">
+  <section class="win" data-tab="misiones">
     <div class="head"><h1>Misión diaria</h1><span class="tag" id="streak">Racha 0</span></div>
     <div class="sub" style="margin:-4px 0 6px">Entrena hoy para ganar XP. Los objetivos suben con tu nivel.</div>
     <div id="quests"></div>
   </section>
 
-  <section class="win">
+  <section class="win" data-tab="mazmorras"><div class="head"><h2>Puertas de mazmorra</h2></div><div id="gates"></div></section>
+  <section class="win" data-tab="mazmorras">
     <div class="head"><h2>Mazmorra de hoy</h2><span class="tag" id="gate"></span></div>
     <div class="row" style="gap:6px;margin-bottom:12px">
       <select id="goal" aria-label="Objetivo"><option value="fuerza">Fuerza</option><option value="masa">Masa</option><option value="definir">Definir</option></select>
@@ -110,24 +128,25 @@ select{flex:1;background:#0a1226;border:1px solid var(--line);color:var(--text);
     <div id="rsess"></div>
   </section>
 
-  <section class="win">
+  <section class="win" data-tab="progreso">
     <div class="head"><h2>Peso corporal</h2><span class="sub" id="wsum"></span></div>
     <div class="row" style="justify-content:flex-start;gap:8px;margin-bottom:8px"><input id="kg" type="number" inputmode="decimal" step="0.1" placeholder="kg" aria-label="Peso en kilos"><button id="addkg">Registrar peso</button></div>
     <div id="wchart"></div>
   </section>
 
-  <section class="win">
+  <section class="win" data-tab="perfil"><div class="head"><h2>Habilidades</h2></div><div id="sklist"></div></section>
+  <section class="win" data-tab="perfil">
     <div class="head"><h2>Atributos</h2></div>
     <div class="stats" id="stats"></div>
     <div class="sub" style="margin-top:10px">Suben con el total de repeticiones y kilómetros que acumulas.</div>
   </section>
 
-  <section class="win">
+  <section class="win" data-tab="progreso">
     <div class="head"><h2>Últimos 7 días</h2><span class="sub" id="wk"></span></div>
     <div class="week" id="week"></div>
   </section>
 
-  <section class="win">
+  <section class="win" data-tab="perfil">
     <div class="head"><h2>Respaldo</h2></div>
     <div class="sub" style="margin-bottom:10px">Descarga tu progreso como archivo y recupéralo cuando quieras, aunque cambies de navegador o de dispositivo.</div>
     <div class="ctrl"><button id="bkexp">Guardar progreso</button><button id="bkimp" class="ghost">Importar archivo</button><input type="file" id="bkfile" accept=".json,application/json" hidden></div>
@@ -135,9 +154,10 @@ select{flex:1;background:#0a1226;border:1px solid var(--line);color:var(--text);
     <div class="ctrl" id="bktxt" hidden><button id="bkpaste" class="ghost">Importar desde el texto</button></div>
   </section>
 
-  <button class="ghost" id="reset" style="width:100%">Reiniciar progreso</button>
+  <button class="ghost" id="reset" data-tab="perfil" style="width:100%">Reiniciar progreso</button>
 </main>
 
+<nav id="nav" aria-label="Menú principal"><button data-go="misiones" aria-current="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path d="M12 8v5"/><path d="M12 16.3v.1"/></svg><span>Misiones</span></button><button data-go="mazmorras"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V11a7 7 0 0 1 14 0v10"/><path d="M9 21v-9a3 3 0 0 1 6 0v9"/><path d="M3 21h18"/></svg><span>Mazmorras</span></button><button data-go="progreso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l7-7 7 7"/><path d="M5 12l7-7 7 7"/></svg><span>Progreso</span></button><button data-go="perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-3.3 0-5.5 2.4-5.5 5.6 0 1.4.4 2.6 1.2 3.6L5 21h14l-2.7-8.8c.8-1 1.2-2.2 1.2-3.6C17.5 5.4 15.3 3 12 3z"/><path d="M9.5 9.5v.1M14.5 9.5v.1"/></svg><span>Perfil</span></button></nav>
 <script>
 (function(){
 var KEY='sl-fit-v1';
@@ -228,7 +248,19 @@ var NAMES=['Empuje','Tirón','Piernas'],REPS={fuerza:'5-6',masa:'8-12',definir:'
 var SK=[[1,'Aguante'],[5,'Sigilo'],[10,'Intimidación'],[20,'Piel de hierro'],[30,'Extracción de sombras'],[40,'Dominio del monarca'],[50,'Ejército de sombras']];
 function showSys(t,m){var o=document.getElementById('lu');o.innerHTML='<div class="win sys"><h1>['+t+']</h1><p>'+m+'</p><button id="luok">Aceptar</button></div>';o.className='on';document.getElementById('luok').onclick=function(){o.className=''};document.getElementById('luok').focus()}
 function levelUp(){var s=SK.filter(function(x){return x[0]===S.level})[0];showSys('Subida de nivel','Nivel <b class="num">'+S.level+'</b> · Rango '+rankOf(S.level)+(s?'<br>Habilidad desbloqueada: '+s[1]:''))}
-function renderExtra(){
+var GATES=[['E',1,'Puerta de entrada'],['D',10,'Cueva de duendes'],['C',20,'Calabozo doble'],['B',30,'Templo de piedra'],['A',40,'Castillo de demonios'],['S',50,'Trono del monarca']];
+function renderMenus(){
+  var cur=0;GATES.forEach(function(g,i){if(S.level>=g[1])cur=i});
+  document.getElementById('gates').innerHTML=GATES.map(function(g,i){var o=S.level>=g[1],n=i===cur;return '<div class="gate '+(n?'now':o?'open':'lock')+'"><b>'+g[0]+'</b><div><span class="nm">'+g[2]+'</span><small>'+(n?'Puerta actual':o?'Superada':'Se abre en el nivel '+g[1])+'</small></div></div>'}).join('');
+  document.getElementById('sklist').innerHTML=SK.map(function(s){var o=S.level>=s[0];return '<div class="gate '+(o?'open':'lock')+'"><b>'+(o?'\u2713':s[0])+'</b><div><span class="nm">'+s[1]+'</span><small>'+(o?'Desbloqueada':'Nivel '+s[0])+'</small></div></div>'}).join('');
+}
+document.getElementById('nav').addEventListener('click',function(ev){
+  var b=ev.target.closest('button');if(!b)return;
+  document.body.dataset.t=b.dataset.go;
+  Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-current',x===b?'true':'false')});
+  window.scrollTo(0,0);
+});
+function renderExtra(){renderMenus();
   S.plan=S.plan||{goal:'masa',days:4,eq:'casa'};S.rdone=S.rdone||{};S.weights=S.weights||[];
   var P=S.plan,k=dk();
   [['goal',P.goal],['dpw',P.days],['eq',P.eq]].forEach(function(p){var el=document.getElementById(p[0]);if(document.activeElement!==el)el.value=p[1]});
